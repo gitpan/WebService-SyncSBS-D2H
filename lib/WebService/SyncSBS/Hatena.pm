@@ -4,7 +4,7 @@ use strict;
 require Exporter;
 
 our @ISA = qw(Exporter);
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Encode;
 use HTTP::Request;
@@ -12,10 +12,10 @@ use XML::Atom::Entry;
 use XML::Atom::Link;
 use XML::Atom::Client;
 
-my $ep_root = "http://b.hatena.ne.jp/atom";
-my $ep_post = $ep_root . "/post";
-my $ep_edit = $ep_root . "/edit";
-my $ep_feed = $ep_root . "/feed";
+my $ep_root = 'http://b.hatena.ne.jp/atom';
+my $ep_post = $ep_root . '/post';
+my $ep_edit = $ep_root . '/edit';
+my $ep_feed = $ep_root . '/feed';
 
 sub new {
     my $class = shift;
@@ -51,12 +51,13 @@ sub get_recent {
 	my @tags;
 	my $description = $_->summary;
 
-	while ($description =~ /\[([^\]]+)\]/) {
-	    my $k = $1;
-	    push(@tags, $k);
-	    $description =~ s/\[$k\]//;
+        while ($description =~ /\[([^\]]+)\]/) {
+            my $k = $1;
+            push(@tags, $k);
+            $k =~ s/([^0-9a-zA-Z])/\\$1/g;
+            $description =~ s/\[$k\]//;
 	}
-	unshift(@tags, $_->getlist($dc, "subject"));
+	unshift(@tags, $_->getlist($dc, 'subject'));
 
 	$ret->{$href} = {
 	    url         => $href,
@@ -98,7 +99,7 @@ sub add {
     foreach my $key (split(' ', $tags)) {
 	if (length($key) <= 32) {
 	    unless ($key =~ /[\?\/\%\[\]]/) {
-		if (scalar(@tag) < 3) {
+		if (scalar(@tag) < 10) {
 		    push(@tag, $key);
 		    next;
 		}
